@@ -65,7 +65,11 @@ oddFactorial x
 -- * https://en.wikipedia.org/wiki/Euclidean_algorithm
 
 myGcd :: Integer -> Integer -> Integer
-myGcd = todo
+myGcd a b
+    |a == 0 = b
+    |b == 0 = a
+    |a < b = myGcd a (b-a)
+    |otherwise = myGcd b (a-b)
 
 ------------------------------------------------------------------------------
 -- Ex 4: Implement the function leftpad which adds space characters
@@ -81,7 +85,7 @@ myGcd = todo
 -- * you can compute the length of a string with the length function
 
 leftpad :: String -> Int -> String
-leftpad = todo
+leftpad s n = if length s >= n then s else leftpad (" "++s) n
 
 ------------------------------------------------------------------------------
 -- Ex 5: let's make a countdown for a rocket! Given a number, you
@@ -97,8 +101,16 @@ leftpad = todo
 -- * you'll probably need a recursive helper function
 
 countdown :: Integer -> String
-countdown = todo
+countdown n = "Ready! "++cd' n ""++"Liftoff!"
 
+-- Helper function that counts from n to 0
+-- returns s if n == 0
+-- otherwise appends "n... " to s and reduces n by one.
+
+cd' :: Integer -> String -> String
+cd' n s
+    |n == 0 = s
+    |otherwise = s++(show n)++"... "++cd' (n-1) s
 ------------------------------------------------------------------------------
 -- Ex 6: implement the function smallestDivisor that returns the
 -- smallest number (greater than 1) that divides the given number evenly.
@@ -114,8 +126,22 @@ countdown = todo
 --
 -- Hint: remember the mod function!
 
+-- in other words: from n down to 2, check all possible 
+-- integer divisors t if they divide n evenly.
+-- Store the smallest found integer (==> if even, replace this)
+
 smallestDivisor :: Integer -> Integer
-smallestDivisor = todo
+smallestDivisor n = sD' n n n 
+
+sD' :: Integer -> Integer -> Integer -> Integer
+sD' n t best_t
+    |t == 1 = best_t
+    |divides n t = sD' n (t-1) t
+    |otherwise = sD' n (t-1) best_t
+
+-- helper function, returns True if b divides a evenly
+divides :: Integer -> Integer -> Bool
+divides a b = if mod a b == 0 then True else False
 
 ------------------------------------------------------------------------------
 -- Ex 7: implement a function isPrime that checks if the given number
