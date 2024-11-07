@@ -150,7 +150,9 @@ divides a b = if mod a b == 0 then True else False
 -- Ps. 0 and 1 are not prime numbers
 
 isPrime :: Integer -> Bool
-isPrime = todo
+isPrime 1 = False
+isPrime 0 = False
+isPrime n = smallestDivisor n == n
 
 ------------------------------------------------------------------------------
 -- Ex 8: implement a function biggestPrimeAtMost that returns the
@@ -165,4 +167,6 @@ isPrime = todo
 --   biggestPrimeAtMost 10 ==> 7
 
 biggestPrimeAtMost :: Integer -> Integer
-biggestPrimeAtMost = todo
+biggestPrimeAtMost n
+    |isPrime n = n
+    |otherwise = biggestPrimeAtMost $ n-1
