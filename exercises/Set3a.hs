@@ -240,7 +240,7 @@ joinToLength n strs = filter (\x -> length x == n) [a++b | a <- strs, b <- strs]
 --   sumRights [Left "bad!", Left "missing"]         ==>  0
 
 sumRights :: [Either a Int] -> Int
-sumRights = todo
+sumRights a = sum $ map (either (\x -> 0) id) a
 
 ------------------------------------------------------------------------------
 -- Ex 12: recall the binary function composition operation
@@ -256,7 +256,9 @@ sumRights = todo
 --   multiCompose [(3*), (2^), (+1)] 0 ==> 6
 --   multiCompose [(+1), (2^), (3*)] 0 ==> 2
 
-multiCompose fs = todo
+-- id is identity function, id * "foo" ==> "foo"
+multiCompose [] = id
+multiCompose (f:fs) = f . multiCompose fs
 
 ------------------------------------------------------------------------------
 -- Ex 13: let's consider another way to compose multiple functions. Given
