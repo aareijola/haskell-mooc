@@ -100,8 +100,15 @@ rangeOf a = maximum a - minimum a
 --   longest [[1,2,3],[4,5],[6]] ==> [1,2,3]
 --   longest ["bcd","def","ab"] ==> "bcd"
 
-longest :: (Ord a) => [a] -> [a]
-longest arr = [x | x <- arr, length x == length (maximum arr)] 
+longest :: (Ord a) => [[a]] -> [a]
+longest arr = foldr (\x y -> if length x > length y then x else 
+            if length x == length y then sel x y else y) [] arr 
+
+-- sel: Select array with smaller first element
+sel :: (Ord a) => [a] -> [a] -> [a]
+sel a b = if head a < head b then a else b
+
+-- longest arr = foldr max [] arr
 
 ------------------------------------------------------------------------------
 -- Ex 6: Implement the function incrementKey, that takes a list of
@@ -117,8 +124,10 @@ longest arr = [x | x <- arr, length x == length (maximum arr)]
 --   incrementKey True [(True,1),(False,3),(True,4)] ==> [(True,2),(False,3),(True,5)]
 --   incrementKey 'a' [('a',3.4)] ==> [('a',4.4)]
 
-incrementKey :: k -> [(k,v)] -> [(k,v)]
-incrementKey = todo
+incrementKey :: (Num v, Eq k) => k -> [(k,v)] -> [(k,v)]
+incrementKey key arr = map (\(k, v) -> if k == key
+                                       then (k, v + 1)
+                                       else (k, v)) arr
 
 ------------------------------------------------------------------------------
 -- Ex 7: compute the average of a list of values of the Fractional
@@ -133,7 +142,7 @@ incrementKey = todo
 -- length to a Fractional
 
 average :: Fractional a => [a] -> a
-average xs = todo
+average xs = sum xs / len where len = fromIntegral $ length xs
 
 ------------------------------------------------------------------------------
 -- Ex 8: given a map from player name to score and two players, return
@@ -152,7 +161,8 @@ average xs = todo
 --     ==> "Lisa"
 
 winner :: Map.Map String Int -> String -> String -> String
-winner scores player1 player2 = todo
+winner scores player1 player2 = if score player1 >= score player2 then player1 else player2 
+                                where score x = Map.findWithDefault 0 x scores
 
 ------------------------------------------------------------------------------
 -- Ex 9: compute how many times each value in the list occurs. Return
@@ -165,9 +175,18 @@ winner scores player1 player2 = todo
 -- Example:
 --   freqs [False,False,False,True]
 --     ==> Map.fromList [(False,3),(True,1)]
+--
+-- foldr func def list
 
-freqs :: (Eq a, Ord a) => [a] -> Map.Map a Int
+-- func needs to take a map and a value from list and produce a map with that 
+-- value in it with a frequency
+
+--freqs :: (Eq a, Ord a) => [a] -> Map.Map a Int
+--freqs xs = foldr (\x y -> Map.alter (\(a,b) -> (a, b+1)) x y) Map.fromList([]) xs 
 freqs xs = todo
+
+-- func :: (Eq a, Ord a) => Map.Map a Int -> a -> Map.Map a Int
+--func map val = Map.alter (incIfFound) val map where incIfFound x = case  
 
 ------------------------------------------------------------------------------
 -- Ex 10: recall the withdraw example from the course material. Write a
@@ -195,7 +214,14 @@ freqs xs = todo
 --     ==> fromList [("Bob",100),("Mike",50)]
 
 transfer :: String -> String -> Int -> Map.Map String Int -> Map.Map String Int
-transfer from to amount bank = todo
+transfer from to amount bank = 
+    case Map.lookup from bank of
+         Nothing  -> bank
+         Just sum -> if sum >= amount && sum >= 0 && amount >= 0
+                     then case Map.lookup to bank of 
+                           Nothing -> bank
+                           Just sum2 -> Map.insert to (sum2 + amount) (Map.insert from (sum - amount) bank)
+                     else bank
 
 ------------------------------------------------------------------------------
 -- Ex 11: given an Array and two indices, swap the elements in the indices.
@@ -204,8 +230,10 @@ transfer from to amount bank = todo
 --   swap 2 3 (array (1,4) [(1,"one"),(2,"two"),(3,"three"),(4,"four")])
 --         ==> array (1,4) [(1,"one"),(2,"three"),(3,"two"),(4,"four")]
 
+-- operator // is the array update operator
+
 swap :: Ix i => i -> i -> Array i a -> Array i a
-swap i j arr = todo
+swap i j arr = arr // [(i, arr ! j),(j, arr ! i)]
 
 ------------------------------------------------------------------------------
 -- Ex 12: given an Array, find the index of the largest element. You
